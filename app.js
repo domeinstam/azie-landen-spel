@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -779,7 +779,7 @@ function renderBatches() {
       button.type = "button";
       button.className = `batch-btn${active ? " active" : ""}`;
       button.innerHTML = `
-        <span class="batch-name"><i class="batch-dot" style="background:${batch.color}"></i><strong>${batch.label}</strong></span>
+        <span class="batch-name"><strong>${batch.label}</strong></span>
         <span>${active ? "aan" : batch.codes.length}</span>
       `;
       button.addEventListener("click", () => toggleBatchSelection(batch.codes));
