@@ -38,7 +38,7 @@ const TOPICS = [
   { code: "israel", name: "Israël", num: 37, cat: 4, labelX: 101.6, labelY: 270.9, fill: "#5fd35f" },
   { code: "koeweit", name: "Koeweit", num: 38, cat: 4, labelX: 165.2, labelY: 278.4, fill: "#e0b04a", alt: ["Kuwait"] },
   { code: "singapore", name: "Singapore", num: 39, cat: 3, labelX: 453.4, labelY: 421.7, fill: "#2fc3e8" },
-  { code: "rusland", name: "Rusland", num: 40, cat: 6, labelX: 395.9, labelY: 104.0, fill: "#ff6fa8" },
+  { code: "rusland", name: "Rusland", num: 40, cat: 6, labelX: 395.9, labelY: 104.0, fill: "#f3bcc8" },
 ];
 
 const GROUPS = [
@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
