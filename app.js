@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.1";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
