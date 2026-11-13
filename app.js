@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.2.2";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -624,7 +624,11 @@ function markWrong(code, target, message = "Bijna. Kijk nog eens goed.") {
 
 function answer(code) {
   if (!session.active) {
-    toggleTopic(code);
+    // Op de telefoon tik je al snel per ongeluk een land aan tijdens het scrollen;
+    // daar kies je landen alleen via de groepen en de lijst.
+    if (!window.matchMedia("(max-width: 760px)").matches) {
+      toggleTopic(code);
+    }
     return;
   }
 
