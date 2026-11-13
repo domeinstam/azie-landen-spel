@@ -639,7 +639,7 @@ h2 {
 }
 
 .azie-map .country.dimmed {
-  opacity: 0.35;
+  opacity: 0.85;
 }
 
 .azie-map .country.done {
@@ -683,7 +683,7 @@ h2 {
 }
 
 .country-label.dimmed-label {
-  opacity: 0.4;
+  opacity: 0.75;
 }
 
 .country-label.typing-target-label {
