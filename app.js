@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.2.2";
+const APP_VERSION = "1.3.0";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -72,6 +72,11 @@ const ui = {
   exitFullscreenProgress: document.querySelector("#exitFullscreenProgress"),
   labelToggle: document.querySelector("#labelToggle"),
   mapGrid: document.querySelector("#mapGrid"),
+  nameGate: document.querySelector("#nameGate"),
+  nameGateForm: document.querySelector("#nameGateForm"),
+  nameGateInput: document.querySelector("#nameGateInput"),
+  nameGateSkip: document.querySelector("#nameGateSkip"),
+  toast: document.querySelector("#toast"),
   playerForm: document.querySelector("#playerForm"),
   playerGreeting: document.querySelector("#playerGreeting"),
   playerNameInput: document.querySelector("#playerNameInput"),
@@ -562,6 +567,64 @@ function startReviewSession() {
   startSessionWith(reviewCodes, true);
 }
 
+function nameSuffix() {
+  return playerName ? `, ${playerName}` : "";
+}
+
+let toastTimer = null;
+
+function showToast(text) {
+  if (!ui.toast) return;
+  ui.toast.textContent = text;
+  ui.toast.classList.add("show");
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => ui.toast.classList.remove("show"), 2600);
+}
+
+const STREAK_PRAISE = [
+  (n) => `Goed bezig${nameSuffix()}! ${n} goed achter elkaar.`,
+  (n) => `Top${nameSuffix()}! ${n} op rij goed.`,
+  (n) => `Wat knap${nameSuffix()}! Al ${n} achter elkaar.`,
+  (n) => `Je bent lekker bezig${nameSuffix()}: ${n} op rij!`,
+];
+
+// Eén compliment per antwoord: einde van de ronde, halverwege, een reeks goede, of doorzetten.
+function praiseFor(code, hadMistake) {
+  const total = session.order.length;
+
+  if (session.done.size >= total) {
+    return session.firstTryCorrect.size === total
+      ? `Foutloos${nameSuffix()}! Alles in één keer goed.`
+      : `Ronde klaar${nameSuffix()}! Mooi gedaan.`;
+  }
+
+  if (total >= 6 && session.done.size === Math.floor(total / 2)) {
+    return `Al de helft${nameSuffix()}! Ga zo door.`;
+  }
+
+  if (session.streak > 0 && session.streak % 3 === 0) {
+    const options = STREAK_PRAISE;
+    return options[(session.streak / 3 - 1) % options.length](session.streak);
+  }
+
+  if (hadMistake && (session.wrongCounts[code] || 0) >= 2) {
+    return `Mooi dat je doorzette${nameSuffix()}!`;
+  }
+
+  return null;
+}
+
+function openNameGate() {
+  ui.nameGate.hidden = false;
+  document.querySelector(".app-shell").inert = true;
+  ui.nameGateInput.focus();
+}
+
+function closeNameGate() {
+  ui.nameGate.hidden = true;
+  document.querySelector(".app-shell").inert = false;
+}
+
 function markCorrect(code) {
   const hadMistake = session.missedInRound.has(code);
   session.attempts += 1;
@@ -577,6 +640,12 @@ function markCorrect(code) {
 
   feedback = { code, type: "correct", hintCode: null };
   typingMessage = "Yes, goed.";
+  const praise = praiseFor(code, hadMistake);
+
+  if (praise) {
+    showToast(praise);
+  }
+
   ui.typedAnswer.value = "";
   playCorrectSound();
   render();
@@ -909,7 +978,7 @@ function renderStatus() {
     } else if (needsPractice > 0) {
       ui.promptText.textContent = `Deze landen oefenen we nog even: ${needsPractice}`;
     } else {
-      ui.promptText.textContent = "Goed bezig. Alles zit erin.";
+      ui.promptText.textContent = `Goed bezig${nameSuffix()}. Alles zit erin.`;
     }
   } else if (selected.size) {
     ui.roundLabel.textContent = "Klaar voor een ronde?";
@@ -992,6 +1061,27 @@ ui.searchInput.addEventListener("input", (event) => {
   renderStateList();
 });
 ui.exitFullscreenBtn?.addEventListener("click", exitMobileFullscreen);
+ui.nameGateForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = ui.nameGateInput.value.trim();
+
+  if (!value) {
+    ui.nameGateInput.focus();
+    return;
+  }
+
+  playerName = value.slice(0, 24);
+  savePlayerName();
+  renderPlayer();
+  closeNameGate();
+  showToast(`Welkom${nameSuffix()}! Kies een regio en druk op Start ronde.`);
+});
+ui.nameGateSkip?.addEventListener("click", closeNameGate);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !ui.nameGate.hidden) {
+    closeNameGate();
+  }
+});
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
@@ -1004,3 +1094,7 @@ document.querySelectorAll("#appVersion, #appVersionTop").forEach((el) => {
 render();
 loadRealMap();
 window.addEventListener("resize", updateMapView);
+
+if (!playerName) {
+  openNameGate();
+}

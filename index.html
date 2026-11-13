@@ -10,9 +10,19 @@
     <title>Landen in en rondom Azië</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=1.2.2" />
+    <link rel="stylesheet" href="styles.css?v=1.3.0" />
   </head>
   <body>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="name-gate" id="nameGate" role="dialog" aria-modal="true" aria-labelledby="nameGateTitle" hidden>
+      <form class="name-gate-card" id="nameGateForm">
+        <h2 id="nameGateTitle">Hoe heet je?</h2>
+        <p>Dan kan ik je tijdens het oefenen aanmoedigen.</p>
+        <input id="nameGateInput" type="text" autocomplete="given-name" maxlength="24" placeholder="Je naam" aria-label="Je naam" />
+        <button type="submit" class="primary-btn">Beginnen</button>
+        <button type="button" class="ghost-btn" id="nameGateSkip">Liever niet</button>
+      </form>
+    </div>
     <main class="app-shell">
       <header class="topbar">
         <div>
@@ -170,6 +180,6 @@
       <p class="map-credit">Landgrenzen: Natural Earth (publiek domein).</p>
     </main>
 
-    <script src="app.js?v=1.2.2"></script>
+    <script src="app.js?v=1.3.0"></script>
   </body>
 </html>
