@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.1.1";
+const APP_VERSION = "1.1.2";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -531,8 +531,16 @@ function updateMapView() {
       ? Math.max(view.width / rect.width, view.height / rect.height)
       : view.width / 900;
   mapSvg.style.setProperty("--ls", String(scale));
+  // Nummer nooit groter dan het land zelf: bij kleine landen schaalt het cijfer mee omlaag.
+  mapSvg.querySelectorAll(".country-label").forEach((label) => {
+    const box = topicBox(label.dataset.code);
+    const landSize = box ? Math.sqrt((box.x2 - box.x1) * (box.y2 - box.y1)) : 20;
+    const size = Math.min(10 * scale, Math.max(0.42 * landSize, 6.5 * Math.min(scale, 1.3)));
+    label.style.fontSize = `${size.toFixed(2)}px`;
+    label.style.strokeWidth = `${(size * 0.24).toFixed(2)}px`;
+  });
   mapSvg.querySelectorAll("#tiny circle").forEach((circle) => {
-    circle.setAttribute("r", String(6.5 * scale));
+    circle.setAttribute("r", String(Math.min(6.5 * scale, 7)));
   });
 }
 
