@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.1.3";
+const APP_VERSION = "1.2.0";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -121,6 +121,7 @@ function createEmptySession() {
     done: new Set(),
     firstTryCorrect: new Set(),
     missedInRound: new Set(),
+    wrongCounts: {},
   };
 }
 
@@ -453,6 +454,7 @@ function startSessionWith(codes, isReview = false) {
     done: new Set(),
     firstTryCorrect: new Set(),
     missedInRound: new Set(),
+    wrongCounts: {},
   };
   feedback = null;
   typingMessage = "";
@@ -602,14 +604,17 @@ function markWrong(code, target, message = "Bijna. Kijk nog eens goed.") {
   session.missedInRound.add(target);
   hardTopics.add(target);
   saveHardTopics();
-  feedback = { code: code || target, type: "wrong", hintCode: target };
-  typingMessage = message;
+  session.wrongCounts[target] = (session.wrongCounts[target] || 0) + 1;
+  // Pas na de tweede fout licht het gevraagde land op (en blijft oplichten tot het goed is).
+  const showHint = session.wrongCounts[target] >= 2;
+  const wrongFeedback = { code: code || null, type: "wrong", hintCode: showHint ? target : null };
+  feedback = wrongFeedback;
+  typingMessage = showHint && practiceMode === "click" ? "Kijk: het land licht nu op." : message;
   playWrongSound();
   render();
-  scrollMapToCodes([target]);
 
   window.setTimeout(() => {
-    if (feedback?.type === "wrong" && feedback?.hintCode === target) {
+    if (feedback === wrongFeedback) {
       feedback = null;
       typingMessage = "";
       render();
@@ -818,7 +823,13 @@ function renderMap() {
     const isSelected = selected.has(topic.code);
     const isDone = session.done.has(topic.code);
     const isFeedback = feedback?.code === topic.code;
-    const isHint = feedback?.hintCode === topic.code;
+    const isHint =
+      feedback?.hintCode === topic.code ||
+      (session.active &&
+        practiceMode === "click" &&
+        currentCode() === topic.code &&
+        (session.wrongCounts[topic.code] || 0) >= 2 &&
+        feedback?.type !== "correct");
     const isTypingTarget =
       session.active && practiceMode === "type" && currentCode() === topic.code;
 
