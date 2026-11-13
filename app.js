@@ -29,12 +29,12 @@ const TOPICS = [
   { code: "bangladesh", name: "Bangladesh", num: 28, cat: 2, labelX: 371.0, labelY: 304.7, fill: "#ff6fa8" },
   { code: "noord-korea", name: "Noord-Korea", num: 29, cat: 1, labelX: 558.3, labelY: 225.1, fill: "#4f8ff7" },
   { code: "zuid-korea", name: "Zuid-Korea", num: 30, cat: 1, labelX: 567.0, labelY: 243.1, fill: "#ff8a3d" },
-  { code: "azerbeidzjan", name: "Azerbeidzjan", num: 31, cat: 5, labelX: 160.5, labelY: 221.9, fill: "#b07cf0", alt: ["Azerbaijan"] },
-  { code: "georgie", name: "Georgië", num: 32, cat: 5, labelX: 129.9, labelY: 212.4, fill: "#ffd21f" },
+  { code: "azerbeidzjan", name: "Azerbeidzjan", num: 31, cat: 4, labelX: 160.5, labelY: 221.9, fill: "#b07cf0", alt: ["Azerbaijan"] },
+  { code: "georgie", name: "Georgië", num: 32, cat: 4, labelX: 129.9, labelY: 212.4, fill: "#ffd21f" },
   { code: "sri-lanka", name: "Sri Lanka", num: 33, cat: 2, labelX: 325.6, labelY: 392.1, fill: "#4f8ff7" },
   { code: "bhutan", name: "Bhutan", num: 34, cat: 2, labelX: 372.2, labelY: 288.3, fill: "#4f8ff7" },
   { code: "taiwan", name: "Taiwan", num: 35, cat: 1, labelX: 529.5, labelY: 309.0, fill: "#e0b04a" },
-  { code: "armenie", name: "Armenië", num: 36, cat: 5, labelX: 141.6, labelY: 221.9, fill: "#2fc3e8" },
+  { code: "armenie", name: "Armenië", num: 36, cat: 4, labelX: 141.6, labelY: 221.9, fill: "#2fc3e8" },
   { code: "israel", name: "Israël", num: 37, cat: 4, labelX: 101.6, labelY: 270.9, fill: "#5fd35f" },
   { code: "koeweit", name: "Koeweit", num: 38, cat: 4, labelX: 165.2, labelY: 278.4, fill: "#e0b04a", alt: ["Kuwait"] },
   { code: "singapore", name: "Singapore", num: 39, cat: 3, labelX: 453.4, labelY: 421.7, fill: "#2fc3e8" },
@@ -45,12 +45,12 @@ const GROUPS = [
   { label: "Oost-Azië", cat: 1, color: "#ffd21f" },
   { label: "Zuid-Azië", cat: 2, color: "#2fc3e8" },
   { label: "Zuidoost-Azië", cat: 3, color: "#b07cf0" },
-  { label: "Midden-Oosten", cat: 4, color: "#ff8a3d" },
-  { label: "Centraal-Azië en Kaukasus", cat: 5, color: "#5fd35f" },
+  { label: "Midden-Oosten en Kaukasus", cat: 4, color: "#ff8a3d" },
+  { label: "Centraal-Azië", cat: 5, color: "#5fd35f" },
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.1.2";
+const APP_VERSION = "1.1.3";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
