@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.0.3";
+const APP_VERSION = "1.1.0";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -459,6 +459,7 @@ function startSessionWith(codes, isReview = false) {
   ui.typedAnswer.value = "";
   render();
   enterMobileFullscreenIfNeeded();
+  updateMapView();
   window.requestAnimationFrame(() => {
     scrollMapToCodes(practiceMode === "type" ? [currentCode()] : session.order, "auto");
   });
@@ -476,41 +477,63 @@ function enterMobileFullscreenIfNeeded() {
 
 function exitMobileFullscreen() {
   document.body.classList.remove("round-fullscreen");
+  updateMapView();
 }
 
 // Op smalle schermen is de kaart breder dan het scherm: schuif het juiste stuk in beeld.
-function scrollMapToCodes(codes, behavior = "smooth") {
-  const scroller = document.querySelector(".map-scroll");
+function scrollMapToCodes() {}
 
-  if (!scroller || !mapSvg) {
-    return;
+const FULL_VIEW = { x: 0, y: 0, width: 900, height: 500 };
+const bboxCache = new Map();
+
+function topicBox(code) {
+  if (!bboxCache.has(code)) {
+    const boxes = (mapElements.get(code) || []).map((element) => element.getBBox());
+    if (!boxes.length) return null;
+    const x1 = Math.min(...boxes.map((b) => b.x));
+    const y1 = Math.min(...boxes.map((b) => b.y));
+    const x2 = Math.max(...boxes.map((b) => b.x + b.width));
+    const y2 = Math.max(...boxes.map((b) => b.y + b.height));
+    bboxCache.set(code, { x1, y1, x2, y2 });
+  }
+  return bboxCache.get(code);
+}
+
+// Tijdens een ronde zoomt de kaart in op de landen die gevraagd worden, zodat alles op het scherm past.
+function updateMapView() {
+  if (!mapSvg) return;
+
+  let view = FULL_VIEW;
+  const codes = session.order.length && (session.active || feedback) ? session.order : [];
+  const boxes = codes.map(topicBox).filter(Boolean);
+
+  if (boxes.length) {
+    const x1 = Math.min(...boxes.map((b) => b.x1));
+    const y1 = Math.min(...boxes.map((b) => b.y1));
+    const x2 = Math.max(...boxes.map((b) => b.x2));
+    const y2 = Math.max(...boxes.map((b) => b.y2));
+    const pad = Math.max(14, Math.max(x2 - x1, y2 - y1) * 0.12);
+    const left = Math.max(0, x1 - pad);
+    const top = Math.max(0, y1 - pad);
+    view = {
+      x: left,
+      y: top,
+      width: Math.min(900, x2 + pad) - left,
+      height: Math.min(500, y2 + pad) - top,
+    };
   }
 
-  const points = codes.map((code) => topicByCode[code]).filter(Boolean);
-
-  if (!points.length) {
-    return;
-  }
-
-  const svgRect = mapSvg.getBoundingClientRect();
-  const viewBox = mapSvg.viewBox.baseVal;
-  const xs = points.map((topic) => topic.labelX);
-  const ys = points.map((topic) => topic.labelY);
-  const centerX = ((Math.min(...xs) + Math.max(...xs)) / 2 / viewBox.width) * svgRect.width;
-  const centerY = ((Math.min(...ys) + Math.max(...ys)) / 2 / viewBox.height) * svgRect.height;
-  const options = { behavior };
-
-  if (scroller.scrollWidth > scroller.clientWidth + 4) {
-    options.left = Math.max(0, centerX - scroller.clientWidth / 2);
-  }
-
-  if (scroller.scrollHeight > scroller.clientHeight + 4) {
-    options.top = Math.max(0, centerY - scroller.clientHeight / 2);
-  }
-
-  if ("left" in options || "top" in options) {
-    scroller.scrollTo(options);
-  }
+  mapSvg.setAttribute("viewBox", `${view.x} ${view.y} ${view.width} ${view.height}`);
+  // --ls = kaart-eenheden per schermpixel, zodat nummers en stippen op elk scherm even groot blijven
+  const rect = mapSvg.getBoundingClientRect();
+  const scale =
+    rect.width && rect.height
+      ? Math.max(view.width / rect.width, view.height / rect.height)
+      : view.width / 900;
+  mapSvg.style.setProperty("--ls", String(scale));
+  mapSvg.querySelectorAll("#tiny circle").forEach((circle) => {
+    circle.setAttribute("r", String(6.5 * scale));
+  });
 }
 
 function startSession() {
@@ -700,6 +723,7 @@ function loadRealMap() {
     addTopicLabels();
     updateLabelVisibility();
     renderMap();
+    updateMapView();
   } catch (error) {
     ui.mapGrid.innerHTML = `
       <div class="map-loading">
@@ -894,6 +918,7 @@ function renderStatus() {
 }
 
 function render() {
+  updateMapView();
   renderBatches();
   renderStateList();
   renderMap();
@@ -955,3 +980,4 @@ document.querySelectorAll("#appVersion, #appVersionTop").forEach((el) => {
 
 render();
 loadRealMap();
+window.addEventListener("resize", updateMapView);
