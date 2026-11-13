@@ -50,7 +50,7 @@ const GROUPS = [
   { label: "Rusland en Oekraïne", cat: 6, color: "#ff6fa8" },
 ];
 
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.3.1";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "azie-landen-selectie";
 const LABELS_STORAGE_KEY = "azie-landen-nummers";
@@ -578,7 +578,7 @@ function showToast(text) {
   ui.toast.textContent = text;
   ui.toast.classList.add("show");
   window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => ui.toast.classList.remove("show"), 2600);
+  toastTimer = window.setTimeout(() => ui.toast.classList.remove("show"), 5500);
 }
 
 const STREAK_PRAISE = [
