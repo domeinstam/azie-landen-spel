@@ -657,8 +657,15 @@ h2 {
 }
 
 .azie-map .country.hint {
-  fill: #f6c548;
-  animation: pulse 900ms ease infinite;
+  fill: #ffffff;
+  stroke: #111;
+  stroke-width: 3px;
+  animation: hint-blink 800ms ease-in-out infinite;
+}
+
+@keyframes hint-blink {
+  0%, 100% { fill: #ffffff; opacity: 1; }
+  50% { fill: #ffe100; opacity: 1; }
 }
 
 .azie-map .country.typing-target {
